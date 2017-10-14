@@ -29,14 +29,16 @@
                 "Latitude": 30,
                 "Longitude": 30
             },
-            "Id": 1337
+            "HardwareId": 1337,
+            "Name": "1"
         },
         {
             "Location": {
                 "Latitude": 40,
                 "Longitude": 40
             },
-            "Id": 8008135
+            "HardwareId": 8008135,
+            "Name": "2"
         }
     ]
 }

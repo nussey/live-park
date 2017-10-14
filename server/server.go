@@ -120,16 +120,16 @@ func (pl *ParkingLot) closestSpot(p *geo.Point) *ParkingSpot {
 
 func (pl *ParkingLot) addParkingSpot(id int64, p *geo.Point) int {
 	s := &ParkingSpot{
-		occupied: false,
-		reserved: false,
-		Location: *p,
-		Id:       id,
+		occupied:   false,
+		reserved:   false,
+		Location:   *p,
+		HardwareId: id,
 	}
 
 	pl.Lock()
 	defer pl.Unlock()
 
-	pl.spots = append(pl.spots, s)
+	pl.spots[id] = s
 
 	return len(pl.spots) - 1
 }
