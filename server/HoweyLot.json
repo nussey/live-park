@@ -30,7 +30,7 @@
                 "Longitude": 30
             },
             "HardwareId": 1337,
-            "Name": "1"
+            "name": "1"
         },
         {
             "Location": {

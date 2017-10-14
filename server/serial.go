@@ -10,7 +10,7 @@ type serialMonitor struct {
 	sm *serial.Port
 
 	buffer []byte
-	out    string
+	out    []byte
 	port   string
 }
 
@@ -27,8 +27,8 @@ func newSerialMonitor(port string, baud int) serialMonitor {
 	return mon
 }
 
-func (s *serialMonitor) readln() string {
-	s.out = ""
+func (s *serialMonitor) readln() []byte {
+	s.out = make([]byte, 0)
 	for true {
 		_, err := s.sm.Read(s.buffer)
 		if err != nil {
@@ -38,8 +38,8 @@ func (s *serialMonitor) readln() string {
 		if c == "\n" {
 			return s.out
 		}
-		s.out += c
+		s.out = append(s.out, s.buffer[0])
 	}
 
-	return ""
+	return s.out
 }

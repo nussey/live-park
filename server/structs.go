@@ -14,7 +14,7 @@ type ParkingSpot struct {
 	Location geo.Point
 	Name     string
 
-	HardwareId int64
+	HardwareId int32
 	battery    int
 }
 
@@ -25,14 +25,14 @@ type ParkingLot struct {
 	// dollars per hour
 	price float32
 
-	spots map[int64]*ParkingSpot
+	spots map[int32]*ParkingSpot
 
 	entrace  geo.Point
 	geofence []geo.Point
 }
 
-func spotsToMap(spots []*ParkingSpot) map[int64]*ParkingSpot {
-	m := make(map[int64]*ParkingSpot)
+func spotsToMap(spots []*ParkingSpot) map[int32]*ParkingSpot {
+	m := make(map[int32]*ParkingSpot)
 	for _, spot := range spots {
 		m[spot.HardwareId] = spot
 	}
@@ -40,7 +40,7 @@ func spotsToMap(spots []*ParkingSpot) map[int64]*ParkingSpot {
 	return m
 }
 
-func mapToSpots(m map[int64]*ParkingSpot) []*ParkingSpot {
+func mapToSpots(m map[int32]*ParkingSpot) []*ParkingSpot {
 	spots := make([]*ParkingSpot, len(m))
 
 	i := 0
@@ -65,12 +65,24 @@ func (p *ParkingLot) MarshalJSON() ([]byte, error) {
 	}{
 		Name:           p.name,
 		Price:          p.price,
-		AvailableSpots: 0,
-		TotalSpots:     1,
+		AvailableSpots: p.AvailableSpots(),
+		TotalSpots:     p.TotalSpots(),
 
 		Entrace:  p.entrace,
 		GeoFence: p.geofence,
 		Spots:    mapToSpots(p.spots),
+	})
+}
+
+func (p *ParkingSpot) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&struct {
+		Name      string
+		Latitude  float64
+		Longitude float64
+	}{
+		Name:      p.Name,
+		Latitude:  p.Location.GetLat(),
+		Longitude: p.Location.GetLong(),
 	})
 }
 
@@ -97,4 +109,10 @@ func (p *ParkingLot) UnmarshalJSON(b []byte) error {
 	p.spots = spotsToMap(d.Spots)
 
 	return nil
+}
+
+type SerialPayload struct {
+	Identifier        int32
+	Occupied          int
+	BatteryPercentage int
 }
