@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/nussey/live-park/server/geo"
@@ -27,7 +29,7 @@ type ParkingLot struct {
 
 	spots map[int32]*ParkingSpot
 
-	entrace  geo.Point
+	entrance geo.Point
 	geofence []geo.Point
 }
 
@@ -59,30 +61,16 @@ func (p *ParkingLot) MarshalJSON() ([]byte, error) {
 		AvailableSpots int
 		TotalSpots     int
 
-		Entrace  geo.Point
+		Entrance geo.Point
 		GeoFence []geo.Point
-		Spots    []*ParkingSpot
 	}{
 		Name:           p.name,
 		Price:          p.price,
 		AvailableSpots: p.AvailableSpots(),
 		TotalSpots:     p.TotalSpots(),
 
-		Entrace:  p.entrace,
+		Entrance: p.entrance,
 		GeoFence: p.geofence,
-		Spots:    mapToSpots(p.spots),
-	})
-}
-
-func (p *ParkingSpot) MarshalJSON() ([]byte, error) {
-	return json.Marshal(&struct {
-		Name      string
-		Latitude  float64
-		Longitude float64
-	}{
-		Name:      p.Name,
-		Latitude:  p.Location.GetLat(),
-		Longitude: p.Location.GetLong(),
 	})
 }
 
@@ -104,9 +92,54 @@ func (p *ParkingLot) UnmarshalJSON(b []byte) error {
 
 	p.name = d.Name
 	p.price = d.Price
-	p.entrace = d.Entrance
+	p.entrance = d.Entrance
 	p.geofence = d.GeoFence
 	p.spots = spotsToMap(d.Spots)
+
+	return nil
+}
+
+func (p *ParkingSpot) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&struct {
+		Name      string
+		Latitude  float64
+		Longitude float64
+		Available bool
+	}{
+		Name:      p.Name,
+		Latitude:  p.Location.GetLat(),
+		Longitude: p.Location.GetLong(),
+		Available: !(p.occupied || p.reserved),
+	})
+}
+
+func (p *ParkingSpot) UnmarshalJSON(b []byte) error {
+	type unmar struct {
+		Name        string
+		HardwareId  int32
+		Coordinates string
+	}
+
+	var d unmar
+
+	err := json.Unmarshal(b, &d)
+	if err != nil {
+		return err
+	}
+
+	p.Name = d.Name
+	p.HardwareId = d.HardwareId
+	coordinates := strings.Split(d.Coordinates, ", ")
+	lat, err := strconv.ParseFloat(coordinates[0], 64)
+	if err != nil {
+		return err
+	}
+
+	long, err := strconv.ParseFloat(coordinates[1], 64)
+	if err != nil {
+		return err
+	}
+	p.Location = *geo.NewPoint(lat, long)
 
 	return nil
 }

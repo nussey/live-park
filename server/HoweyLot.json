@@ -7,36 +7,31 @@
     },
     "GeoFence": [
         {
-            "Latitude": 0,
-            "Longitude": 0
+            "Latitutde": 33.778168,
+            "Longitude": -84.399079
+
         },
         {
-            "Latitude": 50,
-            "Longitude": 0
+            "Latitutde": 33.777842,
+            "Longitude": -84.399093
         },
         {
-            "Latitude": 50,
-            "Longitude": 50
+            "Latitutde": 33.777821,
+            "Longitude": -84.398454
         },
         {
-            "Latitude": 0,
-            "Longitude": 50
+            "Latitutde": 33.778159,
+            "Longitude": -84.398417
         }
     ],
     "Spots": [
         {
-            "Location": {
-                "Latitude": 30,
-                "Longitude": 30
-            },
+            "Coordinates": "33.778138, -84.399059",
             "HardwareId": 1337,
             "name": "1"
         },
         {
-            "Location": {
-                "Latitude": 40,
-                "Longitude": 40
-            },
+            "Coordinates": "33.778137, -84.399036",
             "HardwareId": 8008135,
             "Name": "2"
         }

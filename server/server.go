@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	serialPort = "/dev/cu.usbmodem1411"
+	serialPort = "/dev/cu.usbmodem1421"
 	baudRate   = 9600
 )
 
@@ -33,6 +33,7 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/ReqSpot", lot.ReqSpotHandler).Methods("GET")
 	router.HandleFunc("/LotInfo", lot.LotDataHandler).Methods("GET")
+	router.HandleFunc("/SpotList", lot.SpotListHandler).Methods("GET")
 	go func() { log.Fatal(http.ListenAndServe(":8080", router)) }()
 
 	go monitorSerial(lot)
@@ -52,9 +53,14 @@ func monitorSerial(lot *ParkingLot) {
 		err := json.Unmarshal(str, payload)
 		if err != nil {
 			printer <- "ERROR UNMARSHALING FROM SERIAL"
+			continue
 		}
 
 		spot := lot.GetSpot(payload.Identifier)
+		if spot == nil {
+			printer <- fmt.Sprintf("Invalid hardware ID %d", payload.Identifier)
+			continue
+		}
 		spot.battery = payload.BatteryPercentage
 		state := false
 		if payload.Occupied > 0 {
@@ -185,6 +191,15 @@ func (pl *ParkingLot) LotDataHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write(s)
+}
+
+func (pl *ParkingLot) SpotListHandler(w http.ResponseWriter, r *http.Request) {
+	b, err := json.Marshal(mapToSpots(pl.spots))
+	if err != nil {
+		http.Error(w, "Failed to marshal response", http.StatusInternalServerError)
+	}
+
+	w.Write(b)
 }
 
 func (pl *ParkingLot) ReqSpotHandler(w http.ResponseWriter, r *http.Request) {
