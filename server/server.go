@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"sync"
 
 	"github.com/nussey/live-park/server/geo"
 
@@ -21,113 +20,15 @@ const (
 
 var printer chan string
 
-type ParkingSpot struct {
-	occupied bool
-	reserved bool
-	loc      geo.Point
-
-	id      int64
-	battery int
-}
-
-type ParkingLot struct {
-	sync.Mutex
-
-	name string
-	// dollars per hour
-	price float32
-
-	spots []*ParkingSpot
-
-	entrace  geo.Point
-	geofence []geo.Point
-}
-
-func (p *ParkingLot) MarshalJSON() ([]byte, error) {
-	return json.Marshal(&struct {
-		Name           string
-		Price          float32
-		AvailableSpots int
-		TotalSpots     int
-
-		Entrace  geo.Point
-		GeoFence []geo.Point
-	}{
-		Name:           p.name,
-		Price:          p.price,
-		AvailableSpots: 0,
-		TotalSpots:     1,
-
-		Entrace:  p.entrace,
-		GeoFence: p.geofence,
-	})
-}
-
-func (p *ParkingLot) UnmarshalJSON(b []byte) error {
-	type unmar struct {
-		Name     string
-		Price    float32
-		Entrance geo.Point
-		GeoFence []geo.Point
-		Spots    []geo.Point
-	}
-
-	var d unmar
-
-	err := json.Unmarshal(b, &d)
-	if err != nil {
-		return err
-	}
-
-	p.name = d.Name
-	p.price = d.Price
-	p.entrace = d.Entrance
-	p.geofence = d.GeoFence
-	for _, spot := range d.Spots {
-		p.addParkingSpot(&spot)
-	}
-
-	return nil
-}
-
-// func newParkingLot(name string, entrace *geo.Point, fence []geo.Point) *ParkingLot {
-func newParkingLot(filename string) (*ParkingLot, error) {
-	var lot ParkingLot
-
-	file, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal(file, &lot)
-	if err != nil {
-		return nil, err
-	}
-
-	// lot.name = name
-	// lot.spots = make([]*ParkingSpot, 0)
-	// lot.entrace = *entrace
-	// lot.geofence = fence
-
-	return &lot, nil
-}
-
 func main() {
 	printer = make(chan string)
 
 	mon := newSerialMonitor(serialPort, baudRate)
 
-	// fence := []geo.Point{*geo.NewPoint(0, 0),
-	// 	*geo.NewPoint(50, 0),
-	// 	*geo.NewPoint(50, 50),
-	// 	*geo.NewPoint(0, 50)}
-	// lot := newParkingLot("Howey Lot", geo.NewPoint(10, 10), fence)
 	lot, err := newParkingLot("./HoweyLot.json")
 	if err != nil {
 		log.Fatal("Failed to read JSON: ", err)
 	}
-	// lot.addParkingSpot(geo.NewPoint(1, 1))
-	// lot.addParkingSpot(geo.NewPoint(30, 30))
 
 	// Spin up the webserver
 	router := mux.NewRouter()
@@ -146,6 +47,22 @@ func main() {
 		msg := <-printer
 		fmt.Println(msg)
 	}
+}
+
+func newParkingLot(filename string) (*ParkingLot, error) {
+	var lot ParkingLot
+
+	file, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(file, &lot)
+	if err != nil {
+		return nil, err
+	}
+
+	return &lot, nil
 }
 
 func (pl *ParkingLot) LotDataHandler(w http.ResponseWriter, r *http.Request) {
@@ -178,7 +95,7 @@ func (pl *ParkingLot) ReqSpotHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s, err := json.Marshal(pl.closestSpot(p).loc)
+	s, err := json.Marshal(pl.closestSpot(p).Location)
 	if err != nil {
 		http.Error(w, "failed to marshall response", http.StatusInternalServerError)
 	}
@@ -191,9 +108,9 @@ func (pl *ParkingLot) closestSpot(p *geo.Point) *ParkingSpot {
 	defer pl.Unlock()
 
 	closest := pl.spots[0]
-	dis := p.DistanceTo(&pl.spots[0].loc)
+	dis := p.DistanceTo(&pl.spots[0].Location)
 	for _, p2 := range pl.spots {
-		if p.DistanceTo(&p2.loc) < dis {
+		if p.DistanceTo(&p2.Location) < dis {
 			closest = p2
 		}
 	}
@@ -201,11 +118,12 @@ func (pl *ParkingLot) closestSpot(p *geo.Point) *ParkingSpot {
 	return closest
 }
 
-func (pl *ParkingLot) addParkingSpot(p *geo.Point) int {
+func (pl *ParkingLot) addParkingSpot(id int64, p *geo.Point) int {
 	s := &ParkingSpot{
 		occupied: false,
 		reserved: false,
-		loc:      *p,
+		Location: *p,
+		Id:       id,
 	}
 
 	pl.Lock()

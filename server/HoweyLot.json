@@ -23,18 +23,20 @@
             "Longitude": 50
         }
     ],
-
     "Spots": [
         {
-            "Latitude": 30,
-            "Longitude": 30,
+            "Location": {
+                "Latitude": 30,
+                "Longitude": 30
+            },
             "Id": 1337
         },
         {
-            "Latitude": 40,
-            "Longitude": 40,
+            "Location": {
+                "Latitude": 40,
+                "Longitude": 40
+            },
             "Id": 8008135
         }
     ]
-
 }
