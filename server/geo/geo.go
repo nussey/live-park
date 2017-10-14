@@ -1,20 +1,60 @@
 package geo
 
-import "math"
+import (
+	"encoding/json"
+	"errors"
+	"math"
+)
 
 type Point struct {
 	lat  float64
 	long float64
 }
 
-func NewPoint(lat float64, long float64) *Point {
-	if math.Abs(lat) > 90 || math.Abs(long) > 180 {
-		return nil
+func (p *Point) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&struct {
+		Latitude  float64
+		Longitude float64
+	}{
+		Latitude:  p.lat,
+		Longitude: p.long,
+	})
+}
+
+func (p *Point) UnmarshalJSON(b []byte) error {
+	unmar := &struct {
+		Latitude  float64
+		Longitude float64
+	}{}
+	err := json.Unmarshal(b, unmar)
+	if err != nil {
+		return err
 	}
-	return &Point{
+
+	p.lat = unmar.Latitude
+	p.long = unmar.Longitude
+	if !p.checkPoint() {
+		return errors.New("Invalid point")
+	}
+	return nil
+}
+
+func NewPoint(lat float64, long float64) *Point {
+	p := &Point{
 		lat:  lat,
 		long: long,
 	}
+	if !p.checkPoint() {
+		return nil
+	}
+	return p
+}
+
+func (p *Point) checkPoint() bool {
+	if math.Abs(p.lat) > 90 || math.Abs(p.long) > 180 {
+		return false
+	}
+	return true
 }
 
 func (p *Point) GetLat() float64 {
