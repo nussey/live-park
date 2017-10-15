@@ -28,6 +28,7 @@
   <div id="map"></div>
   <script>
 
+    var doots = new Map();
     async function initMap() {
       var map = new google.maps.Map(document.getElementById('map'), {
         zoom: 20,
@@ -61,24 +62,13 @@
       });
 
       lotGeoFence.setMap(map);
-      while (true) {
-        drawSpots(map);
-        await sleep(5000);
-      }
-    }
-    var doots = new Array();
-    function drawSpots(map) {
+
       var spotRequest = new XMLHttpRequest();
       var url = document.location + "SpotList"
       spotRequest.open("GET", url, false);
       spotRequest.setRequestHeader("Content-type", "application/json");
       spotRequest.send();
       var spots = JSON.parse(spotRequest.responseText);
-
-      for (var i = 0; i < doots.length; i++) {
-        doots[i].setMap(null);
-      }
-
 
       for (var i = 0; i < spots.length; i++) {
         var color = '#FF0000'
@@ -96,17 +86,42 @@
         });
 
         var infowindow = new google.maps.InfoWindow({
-          content: "Spot "+spots[i].Name,
+          content: "Spot " + spots[i].Name,
           position: ll
         });
 
         doot.addListener('click', function (wrapDoot, wrapInfo) {
-          return function() {
+          return function () {
             wrapInfo.open(map, wrapDoot);
           }
         }(doot, infowindow));
 
-        doots[i] = doot
+        doots[spots[i].Name] = doot
+      }
+      while (true) {
+        redrawSpots(map);
+        await sleep(500);
+      }
+    }
+
+    function redrawSpots(map) {
+      var spotRequest = new XMLHttpRequest();
+      var url = document.location + "SpotList"
+      spotRequest.open("GET", url, false);
+      spotRequest.setRequestHeader("Content-type", "application/json");
+      spotRequest.send();
+      var spots = JSON.parse(spotRequest.responseText);
+
+      for (var i = 0; i < spots.length; i++) {
+        color = '#00FF00'
+        if (!spots[i].Available) {
+          var color = '#FF0000'
+        }
+        if (doots[spots[i].Name].fillColor != color) {
+          doots[spots[i].Name].fillColor = color
+          doots[spots[i].Name].setMap(null)
+          doots[spots[i].Name].setMap(map)
+        }
       }
     }
 

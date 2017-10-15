@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/nussey/live-park/server/hue"
 
@@ -39,6 +40,7 @@ func main() {
 	router.HandleFunc("/ReqSpot", lot.ReqSpotHandler).Methods("GET")
 	router.HandleFunc("/LotInfo", lot.LotDataHandler).Methods("GET")
 	router.HandleFunc("/SpotList", lot.SpotListHandler).Methods("GET")
+	router.HandleFunc("/Beacon", lot.BeaconHandler).Methods("GET")
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./../webapp/")))
 	http.Handle("/", router)
 	go func() { log.Fatal(http.ListenAndServe(":8080", nil)) }()
@@ -57,9 +59,11 @@ func monitorSerial(lot *ParkingLot) {
 	for true {
 		str := mon.readln()
 		var payload SerialPayload
-		err := json.Unmarshal(str, payload)
+		err := json.Unmarshal(str, &payload)
 		if err != nil {
 			printer <- "ERROR UNMARSHALING FROM SERIAL"
+			printer <- string(str)
+			printer <- err.Error()
 			continue
 		}
 
@@ -188,6 +192,12 @@ func (pl *ParkingLot) TotalSpots() int {
 	pl.Lock()
 	defer pl.Unlock()
 	return len(pl.spots)
+}
+
+func (pl *ParkingLot) BeaconHandler(w http.ResponseWriter, r *http.Request) {
+	hue.SetBlue()
+	time.Sleep(1 * time.Second)
+	hue.SetRed()
 }
 
 func (pl *ParkingLot) LotDataHandler(w http.ResponseWriter, r *http.Request) {
