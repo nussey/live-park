@@ -4,7 +4,7 @@
 <head>
   <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
   <meta charset="utf-8">
-  <title>Simple Polylines</title>
+  <title>Park Live Controller</title>
   <style>
     /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
@@ -28,7 +28,7 @@
   <div id="map"></div>
   <script>
 
-    function initMap() {
+    async function initMap() {
       var map = new google.maps.Map(document.getElementById('map'), {
         zoom: 20,
         center: { lat: 33.777997, lng: -84.398824 },
@@ -36,12 +36,47 @@
       });
       map.setTilt(0);
 
+      var metaRequest = new XMLHttpRequest();
+      metaRequest.open("GET", "http://localhost:8080/LotInfo", false);
+      metaRequest.setRequestHeader("Content-type", "application/json");
+      metaRequest.send();
+      var meta = JSON.parse(metaRequest.responseText);
 
-      var spotRequest = new XMLHttpRequest();
+      var fence = new Array()
+
+      for (var i = 0; i < meta.GeoFence.length; i++) {
+        var vertex = meta.GeoFence[i]
+        fence[i] = { lat: vertex.Latitude, lng: vertex.Longitude }
+      }
+
+      fence[meta.GeoFence.length] = fence[0]
+
+      var lotGeoFence = new google.maps.Polyline({
+        path: fence,
+        geodesic: true,
+        strokeColor: '#FF0000',
+        strokeOpacity: 1.0,
+        strokeWeight: 2
+      });
+
+      lotGeoFence.setMap(map);
+      while (true) {
+        drawSpots(map);
+        await sleep(1000);
+      }
+    }
+    var doots = new Array();
+    function drawSpots(map) {
+            var spotRequest = new XMLHttpRequest();
       spotRequest.open("GET", "http://localhost:8080/SpotList", false);
       spotRequest.setRequestHeader("Content-type", "application/json");
       spotRequest.send();
       var spots = JSON.parse(spotRequest.responseText);
+
+for (var i = 0; i < doots.length; i++) {
+        doots[i].setMap(null);
+      }
+
 
       for (var i = 0; i < spots.length; i++) {
         var color = '#FF0000'
@@ -56,32 +91,12 @@
           center: { lat: spots[i].Latitude, lng: spots[i].Longitude },
           radius: 0.5,
         });
+        doots[i] = doot
       }
+    }
 
-      var metaRequest = new XMLHttpRequest();
-      metaRequest.open("GET", "http://localhost:8080/LotInfo", false);
-      metaRequest.setRequestHeader("Content-type", "application/json");
-      metaRequest.send();
-      var meta = JSON.parse(metaRequest.responseText);
-
-      var fence = new Array()
-
-      for(var i = 0; i < meta.GeoFence.length; i++) {
-        var vertex = meta.GeoFence[i]
-        fence[i] = {lat: vertex.Latitude, lng: vertex.Longitude}
-      }
-
-      fence[meta.GeoFence.length] = fence[0]
-      
-      var lotGeoFence = new google.maps.Polyline({
-        path: fence,
-        geodesic: true,
-        strokeColor: '#FF0000',
-        strokeOpacity: 1.0,
-        strokeWeight: 2
-      });
-
-      lotGeoFence.setMap(map);
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
     }
   </script>
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDyV845CDVFsSr9v5FKK9UZJqfgoIU7ZZ0&callback=initMap">
