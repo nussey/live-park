@@ -144,7 +144,8 @@
         {
             "Coordinates": "33.778024, -84.398613",
             "HardwareId": 146969,
-            "name": "022"
+            "name": "022",
+            "taken": true
         },
         {
             "Coordinates": "33.777966, -84.398554",
