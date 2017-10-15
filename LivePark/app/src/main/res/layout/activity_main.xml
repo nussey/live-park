@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="jared.livepark.MainActivity">
+
+    <Button
+        android:id="@+id/ParkingNearAddress"
+        android:layout_width="248dp"
+        android:layout_height="61dp"
+        android:text="Parking Near Address"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.503"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.501"
+        tools:layout_editor_absoluteY="226dp" />
+
+    <Button
+        android:id="@+id/ParkingNearMe"
+        android:layout_width="229dp"
+        android:layout_height="62dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:onClick="startMap"
+        android:text="Parking Near Me"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/ParkingNearAddress"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteY="78dp" />
+
+    <Button
+        android:id="@+id/MyCar"
+        android:layout_width="230dp"
+        android:layout_height="61dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:text="My Car"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ParkingNearAddress"
+        tools:layout_editor_absoluteY="362dp" />
+</android.support.constraint.ConstraintLayout>
