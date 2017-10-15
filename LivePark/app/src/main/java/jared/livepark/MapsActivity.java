@@ -43,9 +43,8 @@ import jared.livepark.Models.ParkingSpot;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
         GoogleMap.OnMarkerClickListener, SweetAlertDialog.OnSweetClickListener {
 
-    private static final String SERVER_ADDRESS = "http://172.20.10.6:8080/";
-    private static final String LOT_GET_URL = SERVER_ADDRESS + "LotInfo";
-    private static final String REQ_SPOT_URL = SERVER_ADDRESS + "ReqSpot";
+    private static final String LOT_GET_URL = HttpGetRequest.SERVER_ADDRESS + "LotInfo";
+    private static final String REQ_SPOT_URL = HttpGetRequest.SERVER_ADDRESS + "ReqSpot";
 
     private GoogleMap mMap;
 

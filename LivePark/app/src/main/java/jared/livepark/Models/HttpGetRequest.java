@@ -9,6 +9,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class HttpGetRequest extends AsyncTask<String, Void, String> {
+    public static final String SERVER_ADDRESS = "http://172.20.10.6:8080/";
     @Override
     protected String doInBackground(String... urls) {
         String responseString = "";
