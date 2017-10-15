@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import jared.livepark.Models.ParkingLot;
 import jared.livepark.Models.HttpGetRequest;
 
@@ -46,6 +47,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
 
     private HashMap<String, ParkingLot> lotMap;
+
+    private String previousMarkerClick = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,6 +130,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public boolean onMarkerClick(final Marker marker) {
         Log.d("TAG", "Marker clicked");
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), 17));
+        marker.showInfoWindow();
         ParkingLot lot = lotMap.get(marker.getTitle());
         PolygonOptions rectOptions = new PolygonOptions();
         for (LatLng fencePoint : lot.getFence()) {
@@ -136,6 +141,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         rectOptions.fillColor(0x5fff0000);
         rectOptions.strokeWidth(0);
         Polygon polygon = mMap.addPolygon(rectOptions);
-        return false;
+        if (lot.getTitle().equals(previousMarkerClick)) {
+            SweetAlertDialog pDialog = new SweetAlertDialog(this, SweetAlertDialog.NORMAL_TYPE);
+            pDialog.setTitleText(lot.getTitle());
+            String dialogContent = String.format(
+                    "Available spots: %d\nPrice: %1.2f\nWould you like to park here?",
+                    lot.getAvailableSpots(), lot.getPrice());
+            pDialog.setContentText(dialogContent);
+            pDialog.setConfirmText("Park");
+            pDialog.setCancelText("Cancel");
+            pDialog.showCancelButton(true);
+            pDialog.show();
+        }
+        previousMarkerClick = lot.getTitle();
+        return true;
     }
 }
