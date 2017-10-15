@@ -17,7 +17,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,16 +32,20 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import jared.livepark.Models.ParkingLot;
 import jared.livepark.Models.HttpGetRequest;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
+        GoogleMap.OnMarkerClickListener {
 
     private static final String LOT_GET_URL = "http://172.20.10.6:8080/LotInfo";
 
     private GoogleMap mMap;
+
+    private HashMap<String, ParkingLot> lotMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,9 +76,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 13
         ));
         List<ParkingLot> lots = queryLots();
+        lotMap = new HashMap<>();
         for (ParkingLot lot : lots) {
             mMap.addMarker(new MarkerOptions().position(lot.getEntrance()).title(lot.getTitle()));
+            lotMap.put(lot.getTitle(), lot);
         }
+        mMap.setOnMarkerClickListener(this);
     }
 
     public List<ParkingLot> queryLots() {
@@ -112,5 +122,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.e("MapsActivity", "Error parsing parking lots JSON.");
         }
         return lots;
+    }
+
+    @Override
+    public boolean onMarkerClick(final Marker marker) {
+        Log.d("TAG", "Marker clicked");
+        ParkingLot lot = lotMap.get(marker.getTitle());
+        PolygonOptions rectOptions = new PolygonOptions();
+        for (LatLng fencePoint : lot.getFence()) {
+            Log.d("TAG", fencePoint.toString());
+            rectOptions.add(fencePoint);
+        }
+        rectOptions.fillColor(0x5fff0000);
+        rectOptions.strokeWidth(0);
+        Polygon polygon = mMap.addPolygon(rectOptions);
+        return false;
     }
 }
