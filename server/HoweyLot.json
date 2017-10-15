@@ -70,11 +70,6 @@
             "name": "009"
         },
         {
-            "Coordinates": "33.778027, -84.398983",
-            "HardwareId": 16969,
-            "name": "109"
-        },
-        {
             "Coordinates": "33.778025, -84.398956",
             "HardwareId": 26969,
             "name": "010"
@@ -85,7 +80,7 @@
             "name": "011"
         },
         {
-            "Coordinates": "33.778023, -84.398930",
+            "Coordinates": "33.778027, -84.398984",
             "HardwareId": 46969,
             "name": "012"
         },
@@ -355,6 +350,16 @@
             "Coordinates": "33.777843, -84.398479",
             "HardwareId": 546969,
             "name": "060"
+        },
+        {
+            "Coordinates": "33.777860, -84.399047",
+            "HardwareId": 556969,
+            "name": "062"
+        },
+        {
+            "Coordinates": "33.777861, -84.399075",
+            "HardwareId": 566969,
+            "name": "063"
         },
         {
             "Coordinates": "33.778137, -84.399036",
