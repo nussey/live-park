@@ -37,7 +37,8 @@
       map.setTilt(0);
 
       var metaRequest = new XMLHttpRequest();
-      metaRequest.open("GET", "http://localhost:8080/LotInfo", false);
+      var url = document.location + "LotInfo"
+      metaRequest.open("GET", url, false);
       metaRequest.setRequestHeader("Content-type", "application/json");
       metaRequest.send();
       var meta = JSON.parse(metaRequest.responseText);
@@ -62,18 +63,19 @@
       lotGeoFence.setMap(map);
       while (true) {
         drawSpots(map);
-        await sleep(1000);
+        await sleep(5000);
       }
     }
     var doots = new Array();
     function drawSpots(map) {
-            var spotRequest = new XMLHttpRequest();
-      spotRequest.open("GET", "http://localhost:8080/SpotList", false);
+      var spotRequest = new XMLHttpRequest();
+      var url = document.location + "SpotList"
+      spotRequest.open("GET", url, false);
       spotRequest.setRequestHeader("Content-type", "application/json");
       spotRequest.send();
       var spots = JSON.parse(spotRequest.responseText);
 
-for (var i = 0; i < doots.length; i++) {
+      for (var i = 0; i < doots.length; i++) {
         doots[i].setMap(null);
       }
 
@@ -83,14 +85,27 @@ for (var i = 0; i < doots.length; i++) {
         if (spots[i].Available) {
           color = '#00FF00'
         }
+        var ll = { lat: spots[i].Latitude, lng: spots[i].Longitude }
         var doot = new google.maps.Circle({
           strokeWeight: 0,
           fillOpacity: 1,
           map: map,
           fillColor: color,
-          center: { lat: spots[i].Latitude, lng: spots[i].Longitude },
+          center: ll,
           radius: 0.5,
         });
+
+        var infowindow = new google.maps.InfoWindow({
+          content: "Spot "+spots[i].Name,
+          position: ll
+        });
+
+        doot.addListener('click', function (wrapDoot, wrapInfo) {
+          return function() {
+            wrapInfo.open(map, wrapDoot);
+          }
+        }(doot, infowindow));
+
         doots[i] = doot
       }
     }
