@@ -9,19 +9,24 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/nussey/live-park/server/hue"
+
 	"github.com/nussey/live-park/server/geo"
 
 	"github.com/gorilla/mux"
 )
 
 const (
-	serialPort = "/dev/cu.usbmodem1421"
+	serialPort = "/dev/cu.usbmodem1411"
 	baudRate   = 9600
 )
 
 var printer chan string
 
 func main() {
+	if err := hue.SetGreen(); err != nil {
+		panic(err)
+	}
 	printer = make(chan string)
 
 	lot, err := newParkingLot("./HoweyLot.json")
@@ -34,7 +39,9 @@ func main() {
 	router.HandleFunc("/ReqSpot", lot.ReqSpotHandler).Methods("GET")
 	router.HandleFunc("/LotInfo", lot.LotDataHandler).Methods("GET")
 	router.HandleFunc("/SpotList", lot.SpotListHandler).Methods("GET")
-	go func() { log.Fatal(http.ListenAndServe(":8080", router)) }()
+	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./../webapp/")))
+	http.Handle("/", router)
+	go func() { log.Fatal(http.ListenAndServe(":8080", nil)) }()
 
 	go monitorSerial(lot)
 
@@ -121,7 +128,7 @@ func (pl *ParkingLot) TakeSpot(id int32) error {
 	spot.reserved = false
 	spot.occupied = true
 
-	return nil
+	return hue.SetRed()
 }
 
 // Mark that a spot is reserved for a car coming in
@@ -139,7 +146,7 @@ func (pl *ParkingLot) ReserveSpot(id int32) error {
 	spot.reserved = true
 	spot.occupied = false
 
-	return nil
+	return hue.SetRed()
 }
 
 // Mark that a car just left a spot
@@ -157,7 +164,7 @@ func (pl *ParkingLot) LeaveSpot(id int32) error {
 	spot.reserved = false
 	spot.occupied = false
 
-	return nil
+	return hue.SetGreen()
 }
 
 // Count the number of empty spots in the lot

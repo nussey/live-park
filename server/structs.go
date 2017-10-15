@@ -118,6 +118,7 @@ func (p *ParkingSpot) UnmarshalJSON(b []byte) error {
 		Name        string
 		HardwareId  int32
 		Coordinates string
+		Taken       bool
 	}
 
 	var d unmar
@@ -129,6 +130,9 @@ func (p *ParkingSpot) UnmarshalJSON(b []byte) error {
 
 	p.Name = d.Name
 	p.HardwareId = d.HardwareId
+	if d.Taken {
+		p.occupied = true
+	}
 	coordinates := strings.Split(d.Coordinates, ", ")
 	lat, err := strconv.ParseFloat(coordinates[0], 64)
 	if err != nil {

@@ -2,32 +2,57 @@
     "Name": "Howey Parking Lot",
     "Price": 2.00,
     "Entrance": {
-        "Latitude": 10,
-        "Longitude": 10
+        "Latitude": 33.778095,
+        "Longitude": -84.399097
     },
     "GeoFence": [
         {
-            "Latitutde": 33.778168,
+            "Latitude": 33.778168,
             "Longitude": -84.399079
 
         },
         {
-            "Latitutde": 33.777842,
+            "Latitude": 33.777842,
             "Longitude": -84.399093
         },
         {
-            "Latitutde": 33.777821,
+            "Latitude": 33.777821,
             "Longitude": -84.398454
         },
         {
-            "Latitutde": 33.778159,
+            "Latitude": 33.778159,
             "Longitude": -84.398417
         }
     ],
     "Spots": [
         {
             "Coordinates": "33.778138, -84.399059",
-            "HardwareId": 1337,
+            "HardwareId": 7878,
+            "name": "1"
+        },
+        {
+            "Coordinates": "33.778135, -84.398980",
+            "HardwareId": 213,
+            "name": "1"
+        },
+        {
+            "Coordinates": "33.778139, -84.399006",
+            "HardwareId": 32342,
+            "name": "1"
+        },
+        {
+            "Coordinates": "33.778136, -84.398954",
+            "HardwareId": 13245,
+            "name": "1"
+        },
+        {
+            "Coordinates": "33.778135, -84.398926",
+            "HardwareId": 3489,
+            "name": "1"
+        },
+        {
+            "Coordinates": "33.778135, -84.398900",
+            "HardwareId": 123,
             "name": "1"
         },
         {
