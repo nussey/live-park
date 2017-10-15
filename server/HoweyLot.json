@@ -26,7 +26,7 @@
     "Spots": [
         {
             "Coordinates": "33.778138, -84.399059",
-            "HardwareId": 1768515945,
+            "HardwareId": 123456,
             "name": "001"
         },
         {
@@ -289,7 +289,7 @@
         },
         {
             "Coordinates": "33.777858, -84.398889",
-            "HardwareId": 416969,
+            "HardwareId": 1768515945,
             "name": "047"
         },
         {

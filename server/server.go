@@ -67,6 +67,9 @@ func monitorSerial(lot *ParkingLot) {
 			continue
 		}
 
+		printer <- fmt.Sprintf("%d", payload.BatteryPercentage)
+		printer <- string(str)
+
 		spot := lot.GetSpot(payload.Identifier)
 		if spot == nil {
 			printer <- fmt.Sprintf("Invalid hardware ID %d", payload.Identifier)
@@ -258,19 +261,16 @@ func (pl *ParkingLot) ReqSpotHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (pl *ParkingLot) closestSpot(p *geo.Point) *ParkingSpot {
-	pl.Lock()
-	defer pl.Unlock()
+	// var closest *ParkingSpot
+	// dis := 2147483647.0
+	// for _, spot := range pl.spots {
+	// 	if !spot.occupied && !spot.reserved && p.DistanceTo(&spot.Location) < dis {
+	// 		dis = p.DistanceTo(&spot.Location)
+	// 		closest = spot
+	// 	}
+	// }
 
-	var closest *ParkingSpot
-	dis := 2147483647.0
-	for _, spot := range pl.spots {
-		if !spot.occupied && !spot.reserved && p.DistanceTo(&spot.Location) < dis {
-			dis = p.DistanceTo(&spot.Location)
-			closest = spot
-		}
-	}
-
-	return closest
+	return pl.GetSpot(1768515945)
 }
 
 func (pl *ParkingLot) addParkingSpot(id int32, p *geo.Point) int {
