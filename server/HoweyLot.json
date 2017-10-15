@@ -384,12 +384,12 @@
         },
         {
             "Coordinates": "33.778138, -84.398793",
-            "HardwareId": 616969,
+            "HardwareId": 616869,
             "name": "068"
         },
         {
             "Coordinates": "33.778132, -84.398658",
-            "HardwareId": 626969,
+            "HardwareId": 626869,
             "name": "070"
         },
         {
@@ -416,6 +416,26 @@
             "Coordinates": "33.778134, -84.398492",
             "HardwareId": 656969,
             "name": "075"
+        },
+        {
+            "Coordinates": "33.778141, -84.398794",
+            "HardwareId": 666969,
+            "name": "076"
+        },
+        {
+            "Coordinates": "33.778139, -84.398762",
+            "HardwareId": 676969,
+            "name": "077"
+        },
+        {
+            "Coordinates": "33.778130, -84.398740",
+            "HardwareId": 686969,
+            "name": "078"
+        },
+        {
+            "Coordinates": "33.778134, -84.398710",
+            "HardwareId": 696969,
+            "name": "079"
         },
         {
             "Coordinates": "33.778137, -84.399036",
