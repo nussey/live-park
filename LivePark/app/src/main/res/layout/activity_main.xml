@@ -41,6 +41,7 @@
         android:layout_height="61dp"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
+        android:onClick="startMyCar"
         android:text="My Car"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
